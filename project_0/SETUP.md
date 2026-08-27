@@ -101,7 +101,7 @@ In an SSH session into the QEMU VM:
 ```bash
 sudo apt-get update && sudo apt-get install -y git
 git clone <course-repo-url>
-cd <repo>/project_0/release
+cd <repo>/project_0
 sudo ./setup/setup-vm.sh
 ```
 
@@ -149,13 +149,13 @@ daemon", Docker Desktop is not running — launch it and wait.
 
 ## 2. Bring up the container
 
-Clone the handout on your own machine too (you cloned it in the VM in step 6 for
+Clone the repo on your own machine too (you cloned it in the VM in step 6 for
 Parts 1-3; Part 4's files need to be on the host). The container is defined in
 `setup/`, so run `docker compose` from there:
 
 ```bash
 git clone <course-repo-url>
-cd <repo>/project_0/release/setup
+cd <repo>/project_0/setup
 docker compose up -d --build
 ```
 

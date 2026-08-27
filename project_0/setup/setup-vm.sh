@@ -2,12 +2,11 @@
 #
 # setup-vm.sh — install the VM toolchain for Parts 1-3.
 #
-#   cd project_0/release && sudo ./setup/setup-vm.sh
+#   cd project_0 && sudo ./setup/setup-vm.sh
 #
 # Run this once, inside the Ubuntu VM you set up in SETUP.md. It installs the
 # compilers, libraries, and tools needed to build and run every part of Projects
-# 0 through 4. It does not install any course code; you clone each project's
-# handout yourself.
+# 0 through 4. It does not install any course code; you clone it yourself.
 #
 # Safe to re-run. Works on amd64 and arm64 hosts; the arch-specific steps are
 # guarded on $ARCH.
@@ -55,7 +54,7 @@ fi
 pkg-config --atleast-version=2.0 unicorn \
     || die "libunicorn-dev >= 2.0 required (uc_mmio_map); got $(pkg-config --modversion unicorn 2>/dev/null || echo none)"
 # Project 1 Part III boots a real QEMU VM: it needs qemu-system for this arch and
-# cpio to build the guest initramfs. libvhost-user is vendored into the handout,
+# cpio to build the guest initramfs. libvhost-user is vendored into the repo,
 # so nothing is needed for that.
 if [ "$ARCH" = "arm64" ]; then
     apt-get install -y qemu-system-arm cpio     # provides qemu-system-aarch64
@@ -169,5 +168,5 @@ command -v cpio >/dev/null || die "cpio missing (Project 1 Part III guest initra
 echo "qemu: $("$QEMU_BIN" --version | head -1 | awk '{print $NF}')  ($QEMU_BIN, vhost-user-device-pci ok)"
 
 log "setup complete"
-echo "The toolchain is ready. Clone a project's handout and build it from its"
-echo "own directory; each project has a README."
+echo "The toolchain is ready. Clone a project and build it from its own"
+echo "directory; each project has a README."

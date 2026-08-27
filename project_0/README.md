@@ -29,7 +29,7 @@ If a part fails to build or run, you have an environment problem to fix now; see
 connect VS Code to the VM with the Remote-SSH extension (`localhost:2222`).
 
 **Part 4** lives on your own machine: `part4_docker/hello.c` is an ordinary file
-in your cloned copy of the handout. Edit it with whatever editor you normally use, the container is mounted onto that directory and sees the change right away.
+in your cloned copy of the repo. Edit it with whatever editor you normally use; the container is mounted onto that directory and picks up the change right away.
 
 ## Layout
 
@@ -124,7 +124,7 @@ Run the check in both environments, then build the submission on your machine:
 1. **In the VM:** `./tests/run_tests.sh` — writes `~/cs360v-p0-vm.json`.
 2. **On your machine, container up:** `cd part4_docker && ./run.sh` — writes
    `cs360v-p0-docker.json`.
-3. **On your machine, from `project_0/release/`:** `python3 make-submission.py`.
+3. **On your machine, from `project_0/`:** `python3 make-submission.py`.
    It pulls the VM's file over SSH (keep the VM running), merges the two, and
    writes `submission.json`. If SSH to the VM isn't working it prints how to copy
    the file across by hand.

@@ -1,6 +1,6 @@
 # Part 4's development container. See SETUP.md ("Part 4").
 #
-# Run these from this directory (project_0/release/setup/):
+# Run these from this directory (project_0/setup/):
 #   docker compose up -d --build         # build + start
 #   docker compose exec dev bash         # a shell inside the container
 #   docker compose down                  # when you are finished

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build submission.json for Project 0 from both environments.
 
-Run on your OWN machine, from project_0/release/ in your host clone:
+Run on your OWN machine, from project_0/ in your host clone:
 
     python3 make-submission.py [vm-username]
 
