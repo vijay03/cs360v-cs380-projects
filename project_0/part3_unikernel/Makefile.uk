@@ -1,0 +1,3 @@
+# Build glue: register this app and compile main.c into the unikernel image.
+$(eval $(call addlib,apphello))
+APPHELLO_SRCS-y += $(APPHELLO_BASE)/main.c
