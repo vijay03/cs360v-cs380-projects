@@ -38,6 +38,24 @@ log "installing course toolchain (arch=$ARCH, user=$REAL_USER)"
 log "apt update"
 apt-get update -y
 
+# ---- Kernel: cloud images can boot a cut-down kernel ---------------------
+# The Ubuntu cloud image sometimes boots linux-kvm (minimal), which omits
+# modules Project 2 needs (veth, overlayfs, some cgroup controllers). Make sure
+# the full linux-generic kernel is installed and running; if this run had to
+# install it, a reboot is needed before it takes effect.
+need_reboot=0
+if ! dpkg-query -W -f='${Status}' linux-generic 2>/dev/null | grep -q "install ok installed"; then
+    log "installing the full kernel (linux-generic)"
+    apt-get install -y linux-generic
+    need_reboot=1
+fi
+case "$(uname -r)" in (*-generic) ;; (*) need_reboot=1 ;; esac
+if [ "$need_reboot" = 1 ]; then
+    log "the full kernel is installed but not running yet"
+    echo "Reboot the VM (sudo reboot), reconnect, and run this script again."
+    exit 0
+fi
+
 # ---- Common toolchain (all projects) --------------------------------------
 log "common build toolchain"
 apt-get install -y build-essential pkg-config git make gdb rsync curl

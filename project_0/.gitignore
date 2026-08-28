@@ -11,3 +11,8 @@ __pycache__/
 cs360v-p0-vm.json
 cs360v-p0-docker.json
 submission.json
+
+# VM disk image (downloaded locally, not committed) + any hand-built seed
+/ubuntu.img
+*.qcow2
+/login-seed.img

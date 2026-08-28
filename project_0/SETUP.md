@@ -12,91 +12,71 @@ Everything for Parts 1 to 3 happens inside this VM, over SSH. Use it even if you
 already run Linux: it gives everyone the same environment, with the kernel
 features Project 2 needs.
 
+Clone the repo on your machine first (`git clone <course-repo-url>`); the boot
+command below uses `setup/login-seed.iso` from it, a cloud-init seed that sets
+the `ubuntu` login password to `ubuntu` and enables SSH.
+
 ## 1. Install QEMU
 
 - **Linux:** `sudo apt-get install qemu-system-x86 qemu-utils`
 - **macOS:** `brew install qemu`
 - **Windows:** run the installer from https://qemu.weilnetz.de/w64/, then add
-  `C:\Program Files\qemu` to your `PATH`.
+  `C:\Program Files\qemu` to your `PATH`. Run the QEMU commands below from
+  PowerShell or Command Prompt, on one line (drop the `\` line breaks).
 
-Need version 7.2 or newer (`qemu-system-x86_64 --version`).
+Need QEMU 7.2 or newer (`qemu-system-x86_64 --version`).
 
 ## 2. Get the Ubuntu image
 
-Download the **Ubuntu Server 24.04 LTS** ISO from
-https://ubuntu.com/download/server (Server, not Desktop; the ARM64 ISO on Apple
-Silicon).
-
-## 3. Create the VM disk
+Download the Ubuntu Server 24.04 cloud image from
+https://cloud-images.ubuntu.com/releases/24.04/release/
+(`ubuntu-24.04-server-cloudimg-amd64.img`, or the `-arm64.img` on Apple Silicon)
+and save it as `ubuntu.img` in `<repo>/project_0/`. It is a pre-installed disk,
+so there is no installer to run. Give it room for all the projects (cloud-init
+grows the filesystem on first boot):
 
 ```bash
-qemu-img create -f qcow2 ubuntu.qcow2 20G
+cd <repo>/project_0
+qemu-img resize ubuntu.img 20G
 ```
 
-## 4. Install Ubuntu
+## 3. Boot the VM and connect
 
-Boot the installer; a QEMU window opens. On Windows, put the whole command on one
-line (drop the `\`).
+Run this from `<repo>/project_0` and leave the terminal open; with `-display none`
+the VM has no window and prints nothing. To stop it later, use step 6.
 
 ```bash
 qemu-system-x86_64 -machine accel=hvf:kvm:whpx:tcg -m 4096 -smp 2 \
-  -drive file=ubuntu.qcow2,if=virtio \
-  -cdrom ubuntu-24.04.4-live-server-amd64.iso -boot d
-```
-
-`invalid accelerator ...` on stderr is normal: QEMU is skipping the options your
-OS doesn't have.
-
-The installer runs in the terminal. Use the default on every screen (press *Done* / *Continue* as offered), except:
-
-- **"Update to the new installer"** (if it appears) — choose *Continue without
-  updating*.
-- **Guided storage configuration** — leave *Use an entire disk* selected. Press
-  *Done*, *Done* again on the summary, then *Continue* to confirm erasing the disk.
-- **Profile setup** — enter your name, a server name, a **username**, and a
-  password. Note the username: you log in with it over SSH in step 5.
-- **SSH Setup** — highlight *Install OpenSSH server* and press **Space** to check
-  it, then *Done*.
-- **Featured server snaps** — leave everything unselected, *Done*.
-- **Installation complete** — choose *Reboot Now*.
-
-When it reboots you land back on the installer's first screen: the VM booted the
-ISO again, not your new system. That is expected — close the QEMU window. Step 5
-boots the installed system (its command has no `-cdrom`).
-
-## 5. Run the VM and connect
-
-Boot the installed VM headless (no window opens). Run this in a terminal and leave it there: it holds the running VM and prints nothing. To stop the VM later, use step 7.
-
-```bash
-qemu-system-x86_64 -machine accel=hvf:kvm:whpx:tcg -m 4096 -smp 2 \
-  -drive file=ubuntu.qcow2,if=virtio \
+  -drive file=ubuntu.img,if=virtio \
+  -drive file=setup/login-seed.iso,if=virtio,format=raw \
   -netdev user,id=n,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=n \
   -display none
 ```
 
-Then open a **new terminal window** and connect to the VM over SSH (wait 30-60
-seconds after boot for it to accept connections):
+`invalid accelerator ...` on stderr is normal.
+
+Open a **new terminal window** and connect (the first boot runs cloud-init to set
+the password and grow the disk, so give it 30 to 60 seconds):
 
 ```bash
-ssh -p 2222 <username>@localhost
+ssh -p 2222 ubuntu@localhost        # password: ubuntu
 ```
 
-`<username>` is the account you created in step 4. Run this again in another
-terminal for each extra shell you want.
+The login seed is only read on the first boot; drop the `-drive file=setup/login-seed.iso,...`
+line from later boots.
 
 Troubleshooting:
 
-- **`ssh` is refused.** The VM is probably still booting — wait and retry. If it
-  never connects, drop `-display none` from the boot command to watch the
-  console.
-- **`WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`** You reinstalled the VM,
-  so it has new SSH host keys. Clear the old one and reconnect:
+- **`ssh` is refused.** The VM is probably still booting; wait and retry. If it
+  never connects, drop `-display none` to watch the console.
+- **`WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`** You recreated the VM, so
+  it has new SSH host keys. Clear the old one:
   `ssh-keygen -R '[localhost]:2222'`.
 
-## 6. Install the toolchain
+## 4. Install the toolchain
 
-In an SSH session into the QEMU VM:
+In an SSH session into the VM, clone the repo again and run setup (the copy on
+your host was only to boot the VM; this one, inside the VM, is where you work):
 
 ```bash
 sudo apt-get update && sudo apt-get install -y git
@@ -106,10 +86,30 @@ sudo ./setup/setup-vm.sh
 ```
 
 `setup-vm.sh` installs the compilers, libraries, QEMU, and kraftkit the projects
-need. Run it once. This clone is where you do Parts 1-3; edit the files over SSH
-(see "Editing the files" in [README.md](README.md)).
+need, and turns on unprivileged user namespaces for Part 2. If it stops and
+prints `Reboot the VM ...`, do step 5; otherwise it finished, skip to step 6.
 
-## 7. Shut the VM down
+Edit the files over SSH (see "Editing the files" in [README.md](README.md)).
+
+## 5. Reboot and re-run setup
+
+The cloud image often boots a cut-down kernel, so `setup-vm.sh` installs the full
+one (`linux-generic`) and stops. Reboot to pick it up:
+
+```bash
+sudo reboot
+```
+
+That drops your SSH session. Wait about 30 seconds, reconnect, and run setup
+again; this time it runs to completion:
+
+```bash
+ssh -p 2222 ubuntu@localhost
+cd <repo>/project_0
+sudo ./setup/setup-vm.sh
+```
+
+## 6. Shut the VM down
 
 From an SSH session:
 
@@ -117,7 +117,7 @@ From an SSH session:
 sudo poweroff
 ```
 
-The VM stops and the terminal running QEMU exits. Boot it again with the step 5
+The VM stops and the terminal running QEMU exits. Boot it again with the step 3
 command whenever you come back.
 
 ---
@@ -129,7 +129,7 @@ machine, so set Docker up there.
 
 You probably do not want the QEMU VM and Docker running at the same time,
 especially on a laptop: on macOS and Windows, Docker Desktop is itself a VM, so
-you would be running two. Shut the VM down (step 7 above) before working on
+you would be running two. Shut the VM down (step 6 above) before working on
 Part 4.
 
 ## 1. Install Docker
@@ -149,7 +149,7 @@ daemon", Docker Desktop is not running — launch it and wait.
 
 ## 2. Bring up the container
 
-Clone the repo on your own machine too (you cloned it in the VM in step 6 for
+Clone the repo on your own machine too (you cloned it in the VM in step 4 for
 Parts 1-3; Part 4's files need to be on the host). The container is defined in
 `setup/`, so run `docker compose` from there:
 
