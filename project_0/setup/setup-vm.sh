@@ -40,20 +40,15 @@ apt-get update -y
 
 # ---- Kernel: cloud images can boot a cut-down kernel ---------------------
 # The Ubuntu cloud image sometimes boots linux-kvm (minimal), which omits
-# modules Project 2 needs (veth, overlayfs, some cgroup controllers). Make sure
-# the full linux-generic kernel is installed and running; if this run had to
-# install it, a reboot is needed before it takes effect.
-need_reboot=0
+# modules Project 2 needs (veth, overlayfs, some cgroup controllers). Install
+# linux-generic; it takes effect on the next reboot. Nothing in this script or
+# Project 0 needs it, so we don't stop for the reboot -- the reminder prints at
+# the end.
+reboot_for_kernel=0
 if ! dpkg-query -W -f='${Status}' linux-generic 2>/dev/null | grep -q "install ok installed"; then
-    log "installing the full kernel (linux-generic)"
+    log "installing the full kernel (linux-generic) for Project 2"
     apt-get install -y linux-generic
-    need_reboot=1
-fi
-case "$(uname -r)" in (*-generic) ;; (*) need_reboot=1 ;; esac
-if [ "$need_reboot" = 1 ]; then
-    log "the full kernel is installed but not running yet"
-    echo "Reboot the VM (sudo reboot), reconnect, and run this script again."
-    exit 0
+    reboot_for_kernel=1
 fi
 
 # ---- Common toolchain (all projects) --------------------------------------
@@ -188,3 +183,8 @@ echo "qemu: $("$QEMU_BIN" --version | head -1 | awk '{print $NF}')  ($QEMU_BIN, 
 log "setup complete"
 echo "The toolchain is ready. Clone a project and build it from its own"
 echo "directory; each project has a README."
+if [ "$reboot_for_kernel" = 1 ]; then
+    echo
+    echo "linux-generic was installed. Project 0 works now, but reboot"
+    echo "(sudo reboot) before starting Project 2 so its kernel modules load."
+fi

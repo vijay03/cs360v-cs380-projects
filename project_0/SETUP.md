@@ -102,28 +102,23 @@ sudo ./setup/setup-vm.sh
 ```
 
 `setup-vm.sh` installs the compilers, libraries, QEMU, and kraftkit the projects
-need, and turns on unprivileged user namespaces for Part 2. If it stops and
-prints `Reboot the VM ...`, do step 5; otherwise it finished, skip to step 6.
+need, and turns on unprivileged user namespaces for Part 2.
 
 Edit the files over SSH (see "Editing the files" in [README.md](README.md)).
 
-## 5. Reboot and re-run setup
+## 5. Reboot
 
-The cloud image often boots a cut-down kernel, so `setup-vm.sh` installs the full
-one (`linux-generic`) and stops. Reboot to pick it up:
+The cloud image often boots a cut-down kernel; `setup-vm.sh` installs the full one
+(`linux-generic`) and says so at the end. Project 0 works without it, but reboot
+once before you start Project 2 so its kernel modules load:
 
 ```bash
 sudo reboot
 ```
 
-That drops your SSH session. Wait about 30 seconds, reconnect, and run setup
-again; this time it runs to completion:
+The reboot will drop your SSH session. Wait about 30 seconds and reconnect.
 
-```bash
-ssh -p 2222 ubuntu@localhost
-cd <repo>/project_0
-sudo ./setup/setup-vm.sh
-```
+That completes the VM setup. From here you do Parts 1-3 inside the VM over SSH; see [README.md](README.md) for what each part does, and step 6 to shut the VM down.
 
 ## 6. Shut the VM down
 
