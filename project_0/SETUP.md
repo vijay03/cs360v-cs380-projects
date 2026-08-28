@@ -45,6 +45,8 @@ qemu-img resize ubuntu.img 20G
 Run this from `<repo>/project_0` and leave the terminal open; with `-display none`
 the VM has no window and prints nothing. To stop it later, use step 6.
 
+**amd64 image (Linux, Windows, Intel Mac):**
+
 ```bash
 qemu-system-x86_64 -machine accel=hvf:kvm:whpx:tcg -m 4096 -smp 2 \
   -drive file=ubuntu.img,if=virtio \
@@ -52,6 +54,21 @@ qemu-system-x86_64 -machine accel=hvf:kvm:whpx:tcg -m 4096 -smp 2 \
   -netdev user,id=n,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=n \
   -display none
 ```
+
+**arm64 image (Apple Silicon):** the `virt` board has no built-in BIOS, so it
+needs an explicit CPU and UEFI firmware (`brew install qemu` ships it):
+
+```bash
+qemu-system-aarch64 -machine virt,accel=hvf:tcg -cpu max -m 4096 -smp 2 \
+  -bios edk2-aarch64-code.fd \
+  -drive file=ubuntu.img,if=virtio \
+  -drive file=setup/login-seed.iso,if=virtio,format=raw \
+  -netdev user,id=n,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=n \
+  -display none
+```
+
+If `edk2-aarch64-code.fd` is not found, pass its full path:
+`-bios "$(brew --prefix qemu)/share/qemu/edk2-aarch64-code.fd"`.
 
 `invalid accelerator ...` on stderr is normal.
 
