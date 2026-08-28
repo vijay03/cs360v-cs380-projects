@@ -84,14 +84,20 @@ echo
 echo "Part 3 - Unikernel build time (this may take several seconds)"
 REQ3="Part 3: the unikernel boots and prints its build date and time"
 b3=0
+# Build for this machine's architecture; kraft and QEMU spell it differently and
+# arm64's QEMU needs an explicit "virt" machine type.
+case "$(uname -m)" in
+    (aarch64|arm64) KARCH=arm64;  P3_QEMU=qemu-system-aarch64; P3_MACHINE=(-machine virt) ;;
+    (*)             KARCH=x86_64; P3_QEMU=qemu-system-x86_64;  P3_MACHINE=() ;;
+esac
 # `</dev/null` on kraft and qemu: with a terminal on stdin each switches to an
 # interactive display and its output never reaches this capture.
 if command -v kraft >/dev/null 2>&1; then
-    ( cd "$P0/part3_unikernel" && kraft build --plat qemu --arch x86_64 --no-update --no-prompt </dev/null >/dev/null 2>&1 ) && b3=1
+    ( cd "$P0/part3_unikernel" && kraft build --plat qemu --arch "$KARCH" --no-update --no-prompt </dev/null >/dev/null 2>&1 ) && b3=1
 fi
 if [ $b3 -eq 1 ]; then
-    img="$P0/part3_unikernel/.unikraft/build/hello_qemu-x86_64"
-    out="$(timeout 30 qemu-system-x86_64 -kernel "$img" -nographic -no-reboot -m 64M -cpu max </dev/null 2>&1 | tr -d '\r')"
+    img="$P0/part3_unikernel/.unikraft/build/hello_qemu-$KARCH"
+    out="$(timeout 30 "$P3_QEMU" "${P3_MACHINE[@]}" -kernel "$img" -nographic -no-reboot -m 64M -cpu max </dev/null 2>&1 | tr -d '\r')"
     banner="$(printf '%s' "$out" | grep -aoE '[A-Z][a-z]+ [0-9]+\.[0-9]+\.[0-9]+' | head -1)"
     [ -n "$banner" ] && echo "        (a Unikraft unikernel booted under QEMU: $banner)"
     # __DATE__ __TIME__ looks like  "Aug 27 2026 21:12:55"  (day may have a leading space)
