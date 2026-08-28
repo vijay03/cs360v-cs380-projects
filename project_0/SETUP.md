@@ -55,8 +55,7 @@ qemu-system-x86_64 -machine accel=hvf:kvm:whpx:tcg -m 4096 -smp 2 \
   -display none
 ```
 
-**arm64 image (Apple Silicon):** the `virt` board has no built-in BIOS, so it
-needs an explicit CPU and UEFI firmware (`brew install qemu` ships it):
+**arm64 image (Apple Silicon/M-series):**
 
 ```bash
 qemu-system-aarch64 -machine virt,accel=hvf:tcg -cpu max -m 4096 -smp 2 \
