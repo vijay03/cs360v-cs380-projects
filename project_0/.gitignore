@@ -1,0 +1,18 @@
+# build artifacts
+part1_unicorn/hello
+part2_container/hello
+part3_unikernel/.unikraft/
+part3_unikernel/.config*
+part4_docker/hello
+*.o
+__pycache__/
+
+# submission artifacts (generated locally; not committed)
+cs360v-p0-vm.json
+cs360v-p0-docker.json
+submission.json
+
+# VM disk image (downloaded locally, not committed) + any hand-built seed
+/ubuntu.img
+*.qcow2
+/login-seed.img

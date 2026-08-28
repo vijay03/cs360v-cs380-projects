@@ -1,0 +1,8 @@
+#cloud-config
+# Cloud-init NoCloud seed for the course VM. Sets the `ubuntu` account's password
+# to `ubuntu` and allows SSH password login. No per-student data; identical for
+# everyone. Rebuild the ISO with:
+#   cloud-localds login-seed.iso login-seed.user-data      # (from cloud-image-utils)
+password: ubuntu
+chpasswd: { expire: false }
+ssh_pwauth: true

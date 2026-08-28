@@ -1,0 +1,15 @@
+specification: '0.5'
+name: hello
+unikraft:
+  version: stable
+  kconfig:
+    # nolibc: Unikraft's built-in minimal libc. Enough for printf; no networking
+    # is needed for a hello, which keeps the image tiny and the build fast.
+    - CONFIG_LIBNOLIBC=y
+    - CONFIG_LIBUKSCHED=y
+    - CONFIG_LIBUKSCHEDCOOP=y
+targets:
+  - architecture: x86_64
+    platform: qemu
+  - architecture: arm64
+    platform: qemu

@@ -1,0 +1,28 @@
+# Part 4's development container. See SETUP.md ("Part 4").
+#
+# Run these from this directory (project_0/setup/):
+#   docker compose up -d --build         # build + start
+#   docker compose exec dev bash         # a shell inside the container
+#   docker compose down                  # when you are finished
+#
+# With the container up, `../part4_docker/run.sh` tests it. It does not start or
+# stop it.
+#
+# Note it is `docker compose` (two words, the v2 plugin), not `docker-compose`.
+name: cs360v-p0-part4
+
+services:
+  dev:
+    build:
+      context: .          # this dir; the Dockerfile COPYs nothing, so context is moot
+
+    # Part 4's code, live inside the container: edit ../part4_docker/hello.c in
+    # your normal editor and the container sees the change at once. No rebuild.
+    volumes:
+      - ../part4_docker:/work
+    working_dir: /work
+
+    # Publish the server's port to your machine, so run.sh can connect to it from
+    # outside the container.
+    ports:
+      - "8004:8004"
