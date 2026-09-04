@@ -1,0 +1,7 @@
+stat_rc=0x00000000
+records=0x00000003
+bytes=0x00000012
+seq=0x00000003
+small_rc=0x00000003
+small_untouched=0x11111111
+badaddr_rc=0x00000002

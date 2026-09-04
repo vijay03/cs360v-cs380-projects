@@ -1,0 +1,5 @@
+rc_debug=0x00000000
+rc_info=0x00000000
+rc_warn=0x00000000
+rc_error=0x00000000
+seq=0x00000004

@@ -1,0 +1,16 @@
+emulator/emulator
+tests/oracle
+*.o
+*.elf
+*.bin
+*.log
+# ...but the golden expected logs are provided files, not transient run output:
+!tests/expected/*.log
+
+# Part III (vhost) build artifacts
+vhost/vlog-backend
+vhost/qemu.out
+vhost/virtio.log
+vhost/guest/init
+vhost/guest/initramfs.gz
+vhost/guest/root/

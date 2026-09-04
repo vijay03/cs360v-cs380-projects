@@ -1,0 +1,4 @@
+[0] DEBUG debug message
+[1] INFO info message
+[2] WARN warn message
+[3] ERROR error message
