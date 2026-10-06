@@ -1,0 +1,35 @@
+# Makefile.uk: which source files are compiled into the image.  *** YOU IMPLEMENT ***
+#
+# This is what makes runner.c, and your own library, part of the unikernel.
+# Both are compiled INTO the image from source, the same way as any Unikraft
+# library.
+#
+# See SPEC.md Part I (TODO A) and Part III (TODO B).
+#
+# TODO(student) A: register this application and add runner.c.
+#
+#     $(eval $(call addlib,apprunner))
+#
+#   The name you pass defines the variables you use next: `apprunner` gives you
+#   APPRUNNER_BASE (this directory) and APPRUNNER_SRCS-y (its sources).
+#
+#   runner.c is NOT in this directory and must NOT be copied here: it is in
+#   runner/, one level up. Express its path relative to APPRUNNER_BASE:
+#
+#     APPRUNNER_SRCS-y += $(APPRUNNER_BASE)/../runner/runner.c
+#
+# TODO(student) B (SPEC Part III): register your statistics library as a SECOND
+#   library.
+#
+#   Registering it with addlib makes it a separate library in the build, so its
+#   source is only compiled when the Config.uk option you declared is true:
+#
+#     $(eval $(call addlib,libukstats))
+#     LIBUKSTATS_BASE := $(APPRUNNER_BASE)/libukstats
+#     LIBUKSTATS_SRCS-$(CONFIG_APPRUNNER_STATS) += $(LIBUKSTATS_BASE)/ukstats.c
+#
+#   The `-$(CONFIG_APPRUNNER_STATS)` suffix is what makes ukstats.c compile only
+#   when that option is true.
+#
+# As shipped this file registers nothing, so the build produces no application
+# code and the image will not serve anything.

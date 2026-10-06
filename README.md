@@ -17,3 +17,6 @@ projects reuse them.
 - **[Project 2: Minimal Container Runtime](project_2/)**: run a command inside a Linux container you build from scratch — namespaces,
 a pivot into a read-only rootfs, cgroup limits, dropped capabilities, and a
 seccomp filter — using the kernel features Docker also uses.
+- **[Project 3: A Unikernel](project_3/)**: build a small server program into a
+  Unikraft unikernel, add a kernel library of your own, and write a tool that
+  deploys instances under QEMU and measures how fast they start.

@@ -1,0 +1,20 @@
+### Config.uk: kconfig options for this app.  *** YOU IMPLEMENT ***
+#
+# Declaring an option here lets Makefile.uk compile your library's source only
+# when the option is true.
+#
+# See SPEC.md Part III.
+#
+# TODO(student): declare a boolean option for your statistics library, on by
+# default:
+#
+#     config APPRUNNER_STATS
+#         bool "Collect unikernel statistics (boot time, invocations)"
+#         default y
+#         help
+#           Builds libukstats, which records when boot finished, counts the
+#           invocations the runner serves, and answers INFO from inside the
+#           unikernel.
+#
+# Your Makefile.uk then guards the library's sources with
+# $(CONFIG_APPRUNNER_STATS).

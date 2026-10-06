@@ -51,6 +51,19 @@ if ! dpkg-query -W -f='${Status}' linux-generic 2>/dev/null | grep -q "install o
     reboot_for_kernel=1
 fi
 
+# Project 1 Part III boots the VM's own kernel with `qemu-system-* -kernel` as an
+# unprivileged user, but Ubuntu ships /boot/vmlinuz-* readable only by root. Make
+# the current images readable, and keep new ones readable across kernel updates.
+log "making /boot/vmlinuz-* readable (Project 1 Part III boots it via QEMU)"
+chmod 0644 /boot/vmlinuz-* 2>/dev/null || true
+mkdir -p /etc/kernel/postinst.d
+cat > /etc/kernel/postinst.d/zz-cs360v-kernel-readable <<'EOF'
+#!/bin/sh
+# CS360V: keep kernel images readable so Project 1 Part III can boot them.
+chmod 0644 /boot/vmlinuz-* 2>/dev/null || true
+EOF
+chmod 0755 /etc/kernel/postinst.d/zz-cs360v-kernel-readable
+
 # ---- Common toolchain (all projects) --------------------------------------
 log "common build toolchain"
 apt-get install -y build-essential pkg-config git make gdb rsync curl
@@ -118,8 +131,9 @@ rm -rf "$_p2t"
 # ---- Project 3: unikernel (Unikraft) --------------------------------------
 log "project 3: unikraft toolchain (kraftkit)"
 # qemu-system is already installed above. Unikraft's build system also needs
-# flex/bison/ncurses for kconfig and libelf/uuid for the image tooling.
-apt-get install -y flex bison libncurses-dev libelf-dev uuid-dev
+# flex/bison/ncurses for kconfig, libelf/uuid for the image tooling, and
+# unzip/patch to unpack and patch the libraries it downloads (e.g. lwip).
+apt-get install -y flex bison libncurses-dev libelf-dev uuid-dev unzip patch
 
 # kraft drives the Unikraft build. Install a pinned release binary rather than
 # piping a network installer into a shell, so the result is reproducible.

@@ -1,0 +1,46 @@
+specification: '0.5'
+name: runner
+
+# Kraftfile: what your unikernel is made of. *** YOU IMPLEMENT the TODOs ***
+#
+# This tells kraft which Unikraft core to use and which libraries to link in.
+# The application code itself (runner.c, and your ukstats.c) is wired in
+# by Makefile.uk, not here.
+#
+# See SPEC.md Part I. Build with:  ./deploy/ukdeploy.py build
+
+# TODO(student): the Unikraft core.
+#   Give it `version: stable`, and turn on:
+#       CONFIG_LIBNOLIBC=y      a small C library, enough for runner.c
+#       CONFIG_LIBUKSCHED=y     a thread scheduler...
+#       CONFIG_LIBUKSCHEDCOOP=y ...which the network library (lwip) needs
+# unikraft:
+#   version: stable
+#   kconfig:
+#     - ...
+
+targets:
+  - architecture: x86_64
+    platform: qemu
+  - architecture: arm64
+    platform: qemu
+
+# TODO(student): the libraries.
+#
+#   runner.c is a TCP server, so the unikernel needs a network library: `lwip`
+#   (version: stable). Turn on these options:
+#
+#       CONFIG_LWIP_UKNETDEV=y     bind to the virtio network device
+#       CONFIG_LWIP_TCP=y          TCP
+#       CONFIG_LWIP_THREADS=y      its own threads
+#       CONFIG_LWIP_SOCKET=y       the socket functions runner.c calls
+#       CONFIG_LWIP_AUTOIFACE=y    bring the interface up automatically
+#       CONFIG_LWIP_IPV4=y         IPv4
+#       CONFIG_LWIP_DHCP=y         take an address from QEMU's DHCP server
+#       CONFIG_LWIP_SOCKET_PPOLL=n
+#
+# libraries:
+#   lwip:
+#     version: stable
+#     kconfig:
+#       - ...

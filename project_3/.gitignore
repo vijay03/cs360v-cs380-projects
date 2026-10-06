@@ -1,0 +1,8 @@
+# Unikraft fetches its core and libraries here, and the build output lands here
+# too: hundreds of megabytes, all reproducible from the Kraftfile.
+app/.unikraft/
+# instance state and captured console logs
+app/.ukdeploy/
+app/.config*
+__pycache__/
+*.pyc
